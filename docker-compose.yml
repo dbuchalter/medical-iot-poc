@@ -1,0 +1,40 @@
+services:
+  mqtt:  # Mosquitto MQTT Broker
+    image: eclipse-mosquitto:2.0
+    container_name: mqtt_broker
+    ports:
+      - "1883:1883"  # MQTT Port
+      - "9001:9001"  # MQTT WebSocket Port
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+  influxdb:  # InfluxDB Database
+    image: influxdb:2.6
+    container_name: influxdb
+    ports:
+      - "8086:8086"  # InfluxDB API Port
+    environment:
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin123
+      - INFLUXDB_ORG=medical-org
+      - INFLUXDB_BUCKET=medical_devices
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+
+  grafana:  # Grafana Dashboard
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"  # Grafana Web Port
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  influxdb_data:  # Persistent InfluxDB data
+  grafana_data:   # Persistent Grafana data
